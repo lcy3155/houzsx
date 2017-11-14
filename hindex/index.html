@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.css">
+    <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="node_modules/summernote/dist/summernote.css">
+    <script src="node_modules/summernote/dist/summernote.js"></script>
+    <link rel="stylesheet" href="node_modules/indes.css">
+    <link rel="stylesheet" href="../backend/public/stylesheets/style.css" type="text/css">
+    <script src="../backend/public/javascripts/index.js"></script>
+</head>
+<body>
+<!--<div class="jgr"></div>-->
+<!--<div class="jgr1"></div>-->
+<!--<button class="xb btn btn-success">+</button>-->
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a href="#">选项卡 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">新闻</a></li>
+
+            </ul>
+
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <!-- 输入内容-->
+            <div class="modal-body">
+                    <div>
+                        <h3 class="modal-title" >添加</h3>
+                        <input class="tu-tj" type="file" onchange="setFiles(this)" multiple="multiple" name="file">
+                        <button id="tj">上传</button>
+                        <div class="xuan"></div>
+                        <h3 class="modal-title" >title</h3>
+                        <input id="tit" type="text" class="ka1 form-control" placeholder="Text input">
+                        <h3 class="modal-title" >txt</h3>
+                        <textarea id="txt" class="form-control" rows="3"></textarea>
+                        <button id="shc">添加</button>
+
+                    </div>
+                <div class="xg">
+                    <input class="xgid" type="text" placeholder="请请输入要修改的id号">
+                    <button id="xgbtn">确认修改</button>
+                </div>
+
+            </div>
+            <h2 class="sub-header">内容</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>img</th>
+                        <th>title</th>
+                        <th>txt</th>
+                        <th>修改</th>
+                        <td>删除</td>
+                    </tr>
+                    </thead>
+                    <tbody id="xs">
+                    <!--<tr>-->
+                        <!--<td>1,001</td>-->
+                        <!--<td>Lorem</td>-->
+                        <!--<td>ipsum</td>-->
+                        <!--<td>ipsum</td>-->
+                    <!--</tr>-->
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    var files=null;
+    var setFiles=function(e){
+        files=e.files
+    }
+    $('.tu-tj').change(function(){
+        files=$(this).prop('files')
+    })
+    var Im=null;
+     $('#tj').click(function(){
+         if(files!==null){
+             var fd=new FormData();
+             for(var i=0;i<files.length;i++){
+                 fd.append('file',files[i])
+             }
+             $.ajax({
+                 type:"POST",
+                 url:"http://localhost:3000/item/img1",
+                 // async:true,
+                 data:fd,
+                 contentType:false,   //取消默认类型
+                 processData:false,   //取消默认路径
+                 success:function(e){
+                     console.log(e)
+                    $('.xuan').html('<img src="http://localhost:3000/images/'+e+'">')
+                     Im='http://localhost:3000/images/'+e;
+                     console.log(Im)
+                 }
+             });
+         }
+     })
+
+    //全
+    var tit=$('#tit').val()
+    var txt=$('#txt').val()
+    $('#txt').summernote();
+    //添加按钮
+    $('#shc').click(function(){
+        $.ajax({
+                url:'http://localhost:3000/item/add',
+                type:'POST',
+                data:{
+                    i:Im ,
+                    tou:$('#tit').val(),
+                    tx:$('#txt').val()
+                },
+                success:function (data) {
+                    window.location.reload()
+                }
+            })
+    })
+
+    //获取
+    function llo(){
+        $.ajax({
+            type:"POST",
+            url:"http://localhost:3000/item/se1",
+            success:function(e){
+                console.log(e)
+                for(var i=0;i<e.length;i++){
+                    var string=''
+                    for(i in e){
+                        string+="<tr><td>"+e[i].id+"</td><td><img src="+e[i].img+"></td><td>"+e[i].title+"<td><td>"+e[i].txt.substring(0,10)+"</td><td><button class='sc' data-id='"+e[i].id+"'>删除</button></td></tr>"
+                    }
+                    $('#xs').html(string)
+                }
+            }
+        });
+    }
+    llo();
+    //删除
+    $('#xs').on('click','.sc',function(){
+        var id = $(this).attr('data-id')
+        var _this= $(this)
+        $.ajax({
+            url:"http://localhost:3000/item/se2",
+            type:"POST",
+            data:{
+                aid:id
+            },
+            success:function(e){
+                //console.log(e)
+                llo();
+            }
+        })
+
+    })
+    //修改
+    $('#xgbtn').click(function(){
+        var id =$('.xgid').val()
+        console.log($('#tit').val())
+        $.ajax({
+            url:"http://localhost:3000/item/se3",
+            type:"POST",
+            data:{
+                xg:id,
+                xg0:Im,
+                xg1:$('#tit').val(),
+                xg2:$('#txt').val()
+            },
+            success:function(e){
+                //console.log(e)
+                llo();
+            }
+        })
+
+    })
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+.xuan{
+  width: 100px;
+  height: 70px;
+  border: 1px solid #111;
+}
+.xuan img{
+    width: 100px;
+  height: 70px;
+}
+#xs tr td:nth-child(2) img{
+  width: 50px;
+  height: 35px;
+  border: 1px solid #111;
+}
